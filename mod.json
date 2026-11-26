@@ -5,7 +5,7 @@
     },
     "id": "zakme.predictive_input",
     "name": "Predictive Input Buffer",
-    "version": "v1.1.2",
+    "version": "v1.1.3",
     "developer": "ZakME",
     "description": "Delays a click by a few physics ticks when clicking now would kill you but clicking slightly later would not.",
     "settings": {
@@ -71,6 +71,15 @@
             "description": "Shows the current mode and the last saved input in the corner while playing.",
             "type": "bool",
             "default": true
+        },
+        "toggle-status": {
+            "name": "Toggle Status Label Key",
+            "description": "Shows or hides the status label (mode, ms and last saved input) while playing. The choice is remembered.",
+            "type": "keybind",
+            "default": [
+                "F7"
+            ],
+            "category": "gameplay"
         },
         "log-saves": {
             "name": "Log Saved Inputs",

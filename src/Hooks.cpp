@@ -527,5 +527,14 @@ $on_mod(Loaded) {
     bindCycleKey("cycle-mode", 1);
     bindCycleKey("cycle-mode-back", -1);
 
+    // Shows or hides the corner label. Flips the "show-status" setting, so the
+    // choice is remembered for the next level and the next session.
+    listenForKeybindSettingPresses("toggle-status", [](Keybind const&, bool down, bool repeat, double) {
+        if (!down || repeat || !currentPlayLayer()) return false;
+        Mod::get()->setSettingValue<bool>("show-status", !settings().showStatus);
+        refreshStatus();
+        return true;
+    });
+
     log::info("Predictive Input Buffer loaded. Mode: {}", currentModeName());
 }

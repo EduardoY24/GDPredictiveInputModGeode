@@ -60,3 +60,5 @@ GPL-3.0, see [LICENSE](LICENSE). Do whatever you want with it, just keep it open
 - **v1.1.2:** en modo dual, a veces sólo un ícono tomaba el portal mini (o de gravedad):
   el jugador simulado "gastaba" el portal como si fuera el jugador 2. Ahora las
   predicciones se detienen en portales de tamaño y gravedad y no los tocan.
+- **v1.1.3:** tecla **F7** para ocultar o mostrar la etiqueta de estado mientras juegas
+  (se recuerda la elección).
