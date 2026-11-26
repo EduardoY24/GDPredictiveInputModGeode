@@ -5,22 +5,47 @@
     },
     "id": "zakme.predictive_input",
     "name": "Predictive Input Buffer",
-    "version": "v1.0.0",
+    "version": "v1.1.0",
     "developer": "ZakME",
     "description": "Delays a click by a few physics ticks when clicking now would kill you but clicking slightly later would not.",
     "settings": {
         "mode": {
             "name": "Buffer Mode",
-            "description": "Largest delay (in physics ticks, 240 per second) the mod may add to a click to keep you alive. <cy>Disabled</c> passes every input through untouched.",
+            "description": "Largest delay (in physics ticks, 240 per second) the mod may add to a click to keep you alive. 1 tick is about 4 ms, 16 ticks about 67 ms and 32 ticks about 133 ms. <cy>Disabled</c> passes every input through untouched. Big values save more clicks but make input feel less instant.",
             "type": "string",
             "default": "2 Ticks",
-            "one-of": ["Disabled", "1 Tick", "2 Ticks", "4 Ticks", "6 Ticks", "8 Ticks", "10 Ticks", "12 Ticks", "14 Ticks", "16 Ticks"]
+            "one-of": [
+                "Disabled",
+                "1 Tick",
+                "2 Ticks",
+                "4 Ticks",
+                "6 Ticks",
+                "8 Ticks",
+                "10 Ticks",
+                "12 Ticks",
+                "14 Ticks",
+                "16 Ticks",
+                "20 Ticks",
+                "24 Ticks",
+                "32 Ticks"
+            ]
         },
         "cycle-mode": {
             "name": "Cycle Mode Key",
-            "description": "Cycles Disabled -> 1 -> 2 -> 4 -> 6 -> 8 -> 10 -> 12 -> 14 -> 16 ticks while playing a level.",
+            "description": "Steps to the next mode while playing a level: Disabled -> 1 -> 2 -> 4 -> ... -> 16 -> 20 -> 24 -> 32 ticks, then back to Disabled.",
             "type": "keybind",
-            "default": ["F6"],
+            "default": [
+                "F6"
+            ],
+            "category": "gameplay"
+        },
+        "cycle-mode-back": {
+            "name": "Cycle Mode Back Key",
+            "description": "Steps to the previous mode while playing a level (the reverse of the cycle key).",
+            "type": "keybind",
+            "default": [
+                "F5"
+            ],
             "category": "gameplay"
         },
         "buffer-releases": {

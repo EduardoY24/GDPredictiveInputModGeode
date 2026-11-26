@@ -40,3 +40,12 @@ This is basically an input assist, so runs with it on don't count for leaderboar
 ## License
 
 GPL-3.0, see [LICENSE](LICENSE). Do whatever you want with it, just keep it open source.
+
+## Cambios de este fork (v1.1.0)
+
+- Modos más altos: **20, 24 y 32 ticks** (~83, 100 y 133 ms) además de los originales.
+- Nueva tecla **F5** para regresar al modo anterior (F6 sigue avanzando).
+- La etiqueta de estado muestra también el retraso máximo en milisegundos.
+- Compila con **Geode v6.0.0** (GD 2.2091) usando bindings fijados a un commit probado.
+- `PlayerStateCopy.inc` regenerado con los nombres actuales de los bindings
+  (`tools/gen-player-copy.mjs` actualizado).

@@ -117,7 +117,10 @@ class $modify(PIBPlayLayer, PlayLayer) {
         auto label = m_fields->status.data();
         if (!label) return;
         label->setVisible(settings().showStatus);
-        auto text = fmt::format("Input Buffer: {}", currentModeName());
+        auto maxDelay = settings().maxDelay;
+        auto text = maxDelay > 0
+            ? fmt::format("Input Buffer: {} (~{} ms)", currentModeName(), (maxDelay * 1000 + kTicksPerSecond / 2) / kTicksPerSecond)
+            : fmt::format("Input Buffer: {}", currentModeName());
         if (!lastSave.empty()) text += fmt::format("  |  {}", lastSave);
         label->setString(text.c_str());
     }
@@ -422,13 +425,17 @@ $on_mod(Loaded) {
     );
     if (!hooked) log::error("Failed to hook gameEventTriggered: {}", hooked.unwrapErr());
 
-    listenForKeybindSettingPresses("cycle-mode", [](Keybind const&, bool down, bool repeat, double) {
-        if (!down || repeat || !currentPlayLayer()) return false;
-        cycleMode();
-        log::info("Mode -> {} ({} tick limit)", currentModeName(), settings().maxDelay);
-        refreshStatus();
-        return true;
-    });
+    auto bindCycleKey = [](char const* setting, int direction) {
+        listenForKeybindSettingPresses(setting, [direction](Keybind const&, bool down, bool repeat, double) {
+            if (!down || repeat || !currentPlayLayer()) return false;
+            cycleMode(direction);
+            log::info("Mode -> {} ({} tick limit)", currentModeName(), settings().maxDelay);
+            refreshStatus();
+            return true;
+        });
+    };
+    bindCycleKey("cycle-mode", 1);
+    bindCycleKey("cycle-mode-back", -1);
 
     log::info("Predictive Input Buffer loaded. Mode: {}", currentModeName());
 }

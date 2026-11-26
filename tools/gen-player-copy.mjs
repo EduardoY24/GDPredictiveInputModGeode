@@ -34,7 +34,7 @@ const levelPointers = new Set([
 
 // Value-type containers holding per-player orb/pad/button bookkeeping.
 const containers = new Set([
-    "m_ringRelatedSet", "m_touchedRings", "m_jumpPadRelated", "m_holdingButtons",
+    "m_usedRings", "m_touchedRings", "m_touchedForceIds", "m_holdingButtons",
     "m_potentialSlopeMap", "m_rotateObjectsRelated",
 ]);
 

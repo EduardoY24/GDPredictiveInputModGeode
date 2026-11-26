@@ -38,8 +38,9 @@ namespace pib {
         return kModeNames[modeIndexForName(Mod::get()->getSettingValue<std::string>("mode"))];
     }
 
-    void cycleMode() {
-        auto next = (modeIndexForName(currentModeName()) + 1) % kModeNames.size();
+    void cycleMode(int direction) {
+        auto count = static_cast<int>(kModeNames.size());
+        auto next = ((modeIndexForName(currentModeName()) + direction) % count + count) % count;
         // Fires the setting-changed listener, which calls reload().
         Mod::get()->setSettingValue<std::string>("mode", std::string(kModeNames[next]));
     }
