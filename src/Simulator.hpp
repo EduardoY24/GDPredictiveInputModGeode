@@ -1,5 +1,6 @@
 #pragma once
 
+#include <unordered_set>
 #include <vector>
 
 class GJBaseGameLayer;
@@ -80,6 +81,12 @@ namespace pib {
         void markDead() { m_dead = true; }
         void markUnknown() { m_unknown = true; }
 
+        // Objects the hidden player "used" during the current run. They are
+        // tracked here instead of on the object itself, so a prediction never
+        // consumes an orb, pad or touch trigger before the real player gets to it.
+        void noteActivated(GameObject* object) { m_activated.insert(object); }
+        bool wasActivated(GameObject* object) const { return m_activated.contains(object); }
+
         // Builds the object list a simulated collision pass may touch, and
         // flags the run as Unknown if the player overlaps something the
         // simulation can't model.
@@ -97,5 +104,6 @@ namespace pib {
         float m_finalY = 0.f;
         bool m_dead = false;
         bool m_unknown = false;
+        std::unordered_set<GameObject*> m_activated;
     };
 }

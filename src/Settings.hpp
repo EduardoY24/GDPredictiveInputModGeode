@@ -27,6 +27,7 @@ namespace pib {
         int holdHorizon = 12;
         bool selfCheck = false;
         bool ignoreTwoPlayer = false;
+        bool bufferOnOrbs = false;
     };
 
     // Current values, refreshed whenever a setting changes.

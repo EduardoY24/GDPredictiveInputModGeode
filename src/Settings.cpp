@@ -20,6 +20,7 @@ namespace pib {
             g_settings.holdHorizon = static_cast<int>(mod->getSettingValue<int64_t>("hold-horizon"));
             g_settings.selfCheck = mod->getSettingValue<bool>("self-check");
             g_settings.ignoreTwoPlayer = mod->getSettingValue<bool>("ignore-two-player");
+            g_settings.bufferOnOrbs = mod->getSettingValue<bool>("buffer-on-orbs");
         }
     }
 

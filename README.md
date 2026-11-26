@@ -49,3 +49,14 @@ GPL-3.0, see [LICENSE](LICENSE). Do whatever you want with it, just keep it open
 - Compila con **Geode v6.0.0** (GD 2.2091) usando bindings fijados a un commit probado.
 - `PlayerStateCopy.inc` regenerado con los nombres actuales de los bindings
   (`tools/gen-player-copy.mjs` actualizado).
+- Los clics sobre un orbe ya no se retrasan (opción **Delay Clicks On Orbs**, apagada
+  por defecto). Antes un clic retrasado podía pasar de largo el orbe y perderse.
+- Los orbes de trigger (los cuadrados, `CustomRing`) ahora detienen la predicción
+  en vez de ignorarse, porque sus triggers no se pueden simular.
+- **v1.1.1:** las predicciones ya no modifican el nivel real. Antes, al simular un clic,
+  un orbe de toggle podía activar/desactivar su grupo y tu clic real lo regresaba,
+  así que el orbe parecía ignorado (por ejemplo el de Low Detail). Ahora spawn/toggle
+  de grupos y los orbes/triggers "usados" por el jugador simulado no afectan al real.
+- **v1.1.2:** en modo dual, a veces sólo un ícono tomaba el portal mini (o de gravedad):
+  el jugador simulado "gastaba" el portal como si fuera el jugador 2. Ahora las
+  predicciones se detienen en portales de tamaño y gravedad y no los tocan.

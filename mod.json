@@ -5,7 +5,7 @@
     },
     "id": "zakme.predictive_input",
     "name": "Predictive Input Buffer",
-    "version": "v1.1.0",
+    "version": "v1.1.2",
     "developer": "ZakME",
     "description": "Delays a click by a few physics ticks when clicking now would kill you but clicking slightly later would not.",
     "settings": {
@@ -53,6 +53,12 @@
             "description": "Also delay <cy>releases</c> in wave, where letting go at the wrong tick kills just like pressing does.",
             "type": "bool",
             "default": true
+        },
+        "buffer-on-orbs": {
+            "name": "Delay Clicks On Orbs",
+            "description": "Lets the mod also delay a click while you are touching an orb. Off by default: a delayed click can carry you past the orb so it never activates, and trigger orbs (the square ones) can't be predicted at all.",
+            "type": "bool",
+            "default": false
         },
         "ignore-two-player": {
             "name": "Ignore 2-Player Mode",

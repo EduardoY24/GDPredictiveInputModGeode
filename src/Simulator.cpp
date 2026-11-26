@@ -32,12 +32,6 @@ namespace pib {
                 case GameObjectType::DashRing:
                 case GameObjectType::GravityDashRing:
                 case GameObjectType::SpiderOrb:
-                // Gravity and size portals only change the player itself.
-                case GameObjectType::InverseGravityPortal:
-                case GameObjectType::NormalGravityPortal:
-                case GameObjectType::GravityTogglePortal:
-                case GameObjectType::RegularSizePortal:
-                case GameObjectType::MiniSizePortal:
                     return true;
                 default:
                     return false;
@@ -48,6 +42,15 @@ namespace pib {
         // teleports, mirroring, speed). Touching one ends the run as Unknown.
         bool endsSimulation(GameObjectType type) {
             switch (type) {
+                // Gravity and size portals: GD marks a portal as used per
+                // player, and the hidden player counted as player 2, so in
+                // dual the real second player skipped the portal (only one
+                // icon turned mini). Predictions stop at them instead.
+                case GameObjectType::InverseGravityPortal:
+                case GameObjectType::NormalGravityPortal:
+                case GameObjectType::GravityTogglePortal:
+                case GameObjectType::RegularSizePortal:
+                case GameObjectType::MiniSizePortal:
                 case GameObjectType::ShipPortal:
                 case GameObjectType::CubePortal:
                 case GameObjectType::BallPortal:
@@ -62,6 +65,9 @@ namespace pib {
                 case GameObjectType::SoloPortal:
                 case GameObjectType::TeleportPortal:
                 case GameObjectType::TeleportOrb:
+                // Trigger/toggle orbs (the square ones): what they do depends
+                // on the triggers they fire, which never run in a simulation.
+                case GameObjectType::CustomRing:
                 case GameObjectType::Modifier:
                 case GameObjectType::Special:
                     return true;
@@ -149,6 +155,7 @@ namespace pib {
         m_player = simPlayer;
         m_dead = false;
         m_unknown = false;
+        m_activated.clear();
 
         // Orbs the player is already touching; reaching any other one ends
         // the run, because what happens next depends on the next click.
@@ -232,6 +239,7 @@ namespace pib {
         m_finalY = simPlayer->getPositionY();
         m_player = nullptr;
         m_layer = nullptr;
+        m_activated.clear();
         return result;
     }
 }

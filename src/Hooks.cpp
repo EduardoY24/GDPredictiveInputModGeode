@@ -6,6 +6,7 @@
 #include <Geode/Geode.hpp>
 #include <Geode/loader/SettingV3.hpp>
 #include <Geode/modify/EffectGameObject.hpp>
+#include <Geode/modify/EnhancedGameObject.hpp>
 #include <Geode/modify/GameObject.hpp>
 #include <Geode/modify/GJBaseGameLayer.hpp>
 #include <Geode/modify/PlayerObject.hpp>
@@ -194,6 +195,15 @@ namespace {
         return players;
     }
 
+    // Whether any of these players is overlapping an orb right now. A click
+    // there is meant for the orb, and delaying it can carry the player past
+    // the orb's hitbox so the click is lost.
+    bool touchingAnyOrb(std::vector<PlayerObject*> const& players) {
+        return std::any_of(players.begin(), players.end(), [](PlayerObject* p) {
+            return p->m_touchingRings && p->m_touchingRings->count() > 0;
+        });
+    }
+
     // Clears the level's 2-player flag while an input is handled, so it
     // reaches both players like in a normal dual. Restored on scope exit.
     struct TwoPlayerOverride {
@@ -289,6 +299,10 @@ class $modify(PIBGameLayer, GJBaseGameLayer) {
         // swing the input is left alone.
         bool relevant = !players.empty() && std::all_of(players.begin(), players.end(),
             [](PlayerObject* p) { return isBuffered(gamemodeOf(p)); });
+        if (relevant && down && !settings().bufferOnOrbs && touchingAnyOrb(players)) {
+            // Orb clicks go through untouched unless the player opted in.
+            relevant = false;
+        }
         if (relevant && !down) {
             // Releases only matter in hold modes.
             relevant = settings().bufferReleases && std::any_of(players.begin(), players.end(),
@@ -366,6 +380,50 @@ class $modify(PIBGameLayer, GJBaseGameLayer) {
         }
         GJBaseGameLayer::flipGravity(player, flip, noEffects);
     }
+
+    // --- Nothing a prediction does may change the real level. ---
+    // Trigger/toggle orbs (and any orb or trigger that spawns or toggles
+    // groups) act through these. Before, a prediction could fire a toggle
+    // orb's group, so the real click toggled it right back and the orb
+    // looked ignored.
+
+    void playerTouchedRing(PlayerObject* player, RingObject* ring) {
+        auto& sim = Simulator::get();
+        if (sim.isSimPlayer(player) && ring && ring->m_objectType == GameObjectType::CustomRing) {
+            // What a trigger orb does can't be simulated: stop here instead.
+            sim.markUnknown();
+            return;
+        }
+        GJBaseGameLayer::playerTouchedRing(player, ring);
+    }
+
+    void playerTouchedTrigger(PlayerObject* player, EffectGameObject* object) {
+        if (Simulator::get().isSimPlayer(player)) {
+            Simulator::get().markUnknown();
+            return;
+        }
+        GJBaseGameLayer::playerTouchedTrigger(player, object);
+    }
+
+    void spawnGroup(int group, bool ordered, double delay, std::vector<int> const& remapKeys, int triggerID, int controlID) {
+        if (Simulator::get().active()) return;
+        GJBaseGameLayer::spawnGroup(group, ordered, delay, remapKeys, triggerID, controlID);
+    }
+
+    void spawnObject(GameObject* object, double delay, std::vector<int> const& remapKeys) {
+        if (Simulator::get().active()) return;
+        GJBaseGameLayer::spawnObject(object, delay, remapKeys);
+    }
+
+    void toggleGroupTriggered(int group, bool activate, std::vector<int> const& remapKeys, int triggerID, int controlID) {
+        if (Simulator::get().active()) return;
+        GJBaseGameLayer::toggleGroupTriggered(group, activate, remapKeys, triggerID, controlID);
+    }
+
+    void toggleGroup(int id, bool activate) {
+        if (Simulator::get().active()) return;
+        GJBaseGameLayer::toggleGroup(id, activate);
+    }
 };
 
 class $modify(PIBPlayerObject, PlayerObject) {
@@ -385,6 +443,38 @@ class $modify(PIBPlayerObject, PlayerObject) {
     void incrementJumps() {
         if (Simulator::get().isSimPlayer(this)) return;
         PlayerObject::incrementJumps();
+    }
+};
+
+class $modify(PIBPlayerRing, PlayerObject) {
+    void ringJump(RingObject* ring, bool skipCheck) {
+        auto& sim = Simulator::get();
+        if (sim.isSimPlayer(this) && ring && ring->m_objectType == GameObjectType::CustomRing) {
+            sim.markUnknown();
+            return;
+        }
+        PlayerObject::ringJump(ring, skipCheck);
+    }
+};
+
+// Orbs, pads and touch triggers remember who used them. The hidden player's
+// uses are kept by the simulator so they never mark the real object as used.
+class $modify(PIBEnhancedGameObject, EnhancedGameObject) {
+    void activatedByPlayer(PlayerObject* player) {
+        auto& sim = Simulator::get();
+        if (sim.isSimPlayer(player)) {
+            sim.noteActivated(this);
+            return;
+        }
+        EnhancedGameObject::activatedByPlayer(player);
+    }
+
+    bool hasBeenActivatedByPlayer(PlayerObject* player) {
+        auto& sim = Simulator::get();
+        if (sim.isSimPlayer(player)) {
+            return sim.wasActivated(this) || EnhancedGameObject::hasBeenActivatedByPlayer(player);
+        }
+        return EnhancedGameObject::hasBeenActivatedByPlayer(player);
     }
 };
 
